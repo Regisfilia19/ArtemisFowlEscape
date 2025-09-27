@@ -1,977 +1,117 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-<meta charset="utf-8" />
-
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-
-<title>Artemis Fowl — Manor Escape</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-
-<style>
-
-  :root{
-
-    --bg:#0f1720; --panel:#0b1620; --accent:#c7a000; --muted:#98a0a8; --card:#0e2530;
-
-    --glass: rgba(255,255,255,0.04);
-
-  }
-
-  *{box-sizing:border-box}
-
-  html,body{height:100%}
-
-  body{
-
-    margin:0; font-family: 'Roboto', sans-serif; color:#e6eef6;
-
-    background:
-
-      radial-gradient(1000px 400px at 10% 10%, rgba(199,160,0,0.06), transparent 15%),
-
-      linear-gradient(180deg, rgba(2,6,23,1) 0%, rgba(10,18,30,1) 50%, rgba(4,8,18,1) 100%),
-
-      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><text x="10" y="50" fill="%23000000" opacity="0.03" font-size="60">FOWL MANOR</text></svg>');
-
-    background-blend-mode:screen,normal; padding:20px;
-
-    display:flex; align-items:flex-start; justify-content:center;
-
-  }
-
-
-
-  .container{
-
-    width:100%; max-width:1100px;
-
-    display:grid; grid-template-columns: 1fr 420px; gap:20px;
-
-  }
-
-
-
-  header{
-
-    grid-column:1/-1; display:flex; gap:12px; align-items:center;
-
-  }
-
-  .logo{
-
-    height:72px; width:72px; border-radius:12px; background:linear-gradient(180deg,#112430,#0b1b26); display:flex; align-items:center; justify-content:center; box-shadow: 0 6px 18px rgba(0,0,0,0.6);
-
-    border:2px solid rgba(199,160,0,0.12); font-family:'Nosifer', cursive; color:var(--accent); font-size:28px;
-
-  }
-
-  h1{margin:0; font-size:20px; letter-spacing:0.6px}
-
-  p.lead{margin:0; color:var(--muted); font-size:14px}
-
-
-
-  .main{
-
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-
-    border-radius:12px; padding:18px; box-shadow: 0 8px 40px rgba(2,6,23,0.7); min-height:520px;
-
-  }
-
-
-
-  .panel{
-
-    background:var(--panel); border-radius:10px; padding:14px; margin-bottom:12px;
-
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
-
-  }
-
-
-
-  .puzzle{
-
-    border-radius:8px; padding:12px; background:var(--card); margin-bottom:12px;
-
-  }
-
-  .puzzle h2{margin:0 0 8px 0; font-size:16px}
-
-  .desc{color:var(--muted); font-size:14px; margin-bottom:10px}
-
-  .code-row{display:flex; gap:8px; align-items:center}
-
-  input[type="text"]{
-
-    padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02);
-
-    color:inherit; font-size:14px; flex:1;
-
-  }
-
-  button{
-
-    padding:8px 12px; border-radius:8px; background:linear-gradient(180deg,var(--accent), #a17a00); border:0; color:#071017; font-weight:700; cursor:pointer;
-
-  }
-
-  button.secondary{background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.04); font-weight:600}
-
-  small.hint{display:block; color:var(--muted); margin-top:8px}
-
-
-
-  aside.side{
-
-    position:relative; height:100%;
-
-    display:flex; flex-direction:column; gap:12px;
-
-  }
-
-  .status{
-
-    position:sticky; top:20px; background:var(--glass); padding:14px; border-radius:10px; border:1px solid rgba(255,255,255,0.03);
-
-  }
-
-  .status .timer{font-size:24px; color:var(--accent); font-weight:700}
-
-  .progress-bar{height:10px; background:rgba(255,255,255,0.03); border-radius:6px; overflow:hidden; margin-top:8px}
-
-  .progress{height:100%; background:linear-gradient(90deg,#5bd6a6,var(--accent)); width:0%}
-
-
-
-  .log{margin-top:12px; font-size:13px; color:var(--muted); max-height:210px; overflow:auto; padding-right:6px}
-
-  .clue-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
-
-  .clue{background:rgba(255,255,255,0.02); padding:10px; border-radius:8px; font-size:13px; color:var(--muted)}
-
-
-
-  footer{grid-column:1/-1; color:var(--muted); font-size:13px; margin-top:6px; text-align:center}
-
-
-
-  /* Suspect UI */
-
-  .suspects{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap}
-
-  .suspect{flex:1 1 48%; padding:10px; background:rgba(255,255,255,0.02); border-radius:8px; cursor:pointer; text-align:center}
-
-  .suspect.selected{outline:2px solid rgba(199,160,0,0.18); box-shadow:0 6px 18px rgba(0,0,0,0.5)}
-
-  .suspect img{width:70px; height:70px; object-fit:cover; border-radius:6px; margin-bottom:8px}
-
-
-
-  /* admin / small screens */
-
-  @media (max-width:900px){
-
-    .container{grid-template-columns:1fr; padding-bottom:60px}
-
-    aside.side{order:2}
-
-  }
-
-</style>
-
+ <meta charset="UTF-8">
+ <title>Artemis Fowl Escape Room</title>
+ <style>
+   body {
+     font-family: "Trebuchet MS", sans-serif;
+     background: url('https://i.imgur.com/MB9Z6vV.jpg') no-repeat center center fixed;
+     background-size: cover;
+     color: #f0f0f0;
+     text-align: center;
+     padding: 50px;
+   }
+   .container {
+     background: rgba(0, 0, 0, 0.7);
+     padding: 20px;
+     border-radius: 10px;
+     max-width: 600px;
+     margin: auto;
+   }
+   h1 {
+     color: gold;
+   }
+   .riddle {
+     display: none;
+     margin-top: 20px;
+   }
+   input {
+     padding: 8px;
+     margin: 10px;
+   }
+   button {
+     padding: 8px 16px;
+     background: gold;
+     border: none;
+     cursor: pointer;
+     font-weight: bold;
+   }
+   button:hover {
+     background: darkorange;
+   }
+   .success {
+     color: lightgreen;
+     font-weight: bold;
+   }
+   .error {
+     color: tomato;
+     font-weight: bold;
+   }
+ </style>
 </head>
-
 <body>
-
-  <div class="container" role="application" aria-label="Artemis Fowl escape room">
-
-    <header>
-
-      <div class="logo" aria-hidden="true">AF</div>
-
-      <div>
-
-        <h1>Fowl Manor — Recovery Operation</h1>
-
-        <p class="lead">You have 45 minutes to find the fairy artifact. Solve riddles, crack codes, and identify the culprit.</p>
-
-      </div>
-
-    </header>
-
-
-
-    <main class="main" id="main">
-
-      <!-- Puzzles will be injected here -->
-
-    </main>
-
-
-
-    <aside class="side">
-
-      <div class="status panel" aria-live="polite">
-
-        <div><strong>Time Remaining</strong></div>
-
-        <div class="timer" id="timer">45:00</div>
-
-
-
-        <div class="progress-bar" title="Progress">
-
-          <div class="progress" id="progress"></div>
-
-        </div>
-
-
-
-        <div style="margin-top:10px;">
-
-          <strong>Completed:</strong> <span id="completed">0</span>/<span id="total">0</span>
-
-        </div>
-
-
-
-        <div class="log" id="log" aria-live="polite"></div>
-
-
-
-        <div style="margin-top:12px; display:flex; gap:8px;">
-
-          <button class="secondary" id="hintBtn">Give Hint</button>
-
-          <button id="resetBtn" class="secondary">Reset</button>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="panel" id="cluesPanel" style="position:sticky; top:320px;">
-
-        <strong>Found Clues</strong>
-
-        <div class="clue-grid" id="clueGrid"></div>
-
-        <small class="hint">Clues appear here as you solve puzzles.</small>
-
-      </div>
-
-    </aside>
-
-
-
-    <footer>Built for 5th–6th grade GT learners • Admin: type <code>admin:unlock</code> into the console to open admin panel</footer>
-
-  </div>
-
-
-
-<script>
-
-/* =========================
-
-   CONFIGURABLE PUZZLES
-
-   Each puzzle object:
-
-     id, title, type: 'riddle'|'cipher'|'substitution'|'logic'|'suspect',
-
-     prompt (HTML allowed), solution (string or function), onSuccess (optional)
-
-   ========================= */
-
-
-
-const PUZZLES = [
-
-  {
-
-    id: 'riddle-echo',
-
-    title: "Butler's Echo Riddle",
-
-    type: 'riddle',
-
-    prompt: `I speak without a mouth, and hear without ears. I have no body, but I come alive with wind.<br/><em>Enter the one-word answer (no punctuation).</em>`,
-
-    solution: 'echo',
-
-    reward: 'A folded note: "Search beneath the owl portrait."'
-
-  },
-
-  {
-
-    id: 'caesar-foaly',
-
-    title: "Foaly's Encrypted Note (Caesar Cipher)",
-
-    type: 'cipher',
-
-    prompt: `A note from Foaly: <span style="font-family:monospace">"Ymnx nx f xjhwjy." </span><br/><small>Hint: shift letters back by 5.</small>`,
-
-    solution: (input) => {
-
-      // expected plaintext: "This is a secret."
-
-      const cleaned = input.trim().toLowerCase().replace(/[^a-z]/g,'');
-
-      return cleaned === 'thisisasecret';
-
-    },
-
-    reward: 'A code: 196 (found under the library book).'
-
-  },
-
-  {
-
-    id: 'runes-sub',
-
-    title: "Gnommish Runes Substitution",
-
-    type: 'substitution',
-
-    prompt: `A Gnommish strip shows: <strong>ƕ • ɤ • ʒ</strong><br/>Use the substitution key: ƕ=A, ɤ=R, ʒ=T. Translate to a 3-letter English word.`,
-
-    solution: 'art',
-
-    reward: 'A sketch of Opal with smeared ink near the window.'
-
-  },
-
-  {
-
-    id: 'sequence',
-
-    title: "Number Sequence",
-
-    type: 'logic',
-
-    prompt: `What is the next number in the series?<br/><code>2, 6, 12, 20, ?</code>`,
-
-    solution: '30',
-
-    reward: 'A torn page with the letters O P A L circled.'
-
-  },
-
-  {
-
-    id: 'suspect',
-
-    title: "Identify the Culprit — Who Stole the Artifact?",
-
-    type: 'suspect',
-
-    prompt: `
-
-      <p>The artifact was stolen during dinner. The suspects are below. You must select the one culprit based on clues you've found.</p>
-
-      <div id="suspectClues" class="desc">Collect all other clues first. (This puzzle unlocks when at least 3 puzzles solved.)</div>
-
-    `,
-
-    // solution is validated by checking collected clues
-
-    solution: (choice, state) => {
-
-      // logic: the real culprit is Opal; require certain clues found
-
-      const hasOpalClue = state.clues.some(c => c.includes('Opal'));
-
-      const hasRune = state.clues.some(c => c.toLowerCase().includes('art'));
-
-      // require both to avoid guessing early
-
-      return (choice === 'opal' && hasOpalClue && hasRune);
-
-    },
-
-    reward: 'You recovered the fairy artifact! Open the chest!'
-
-  }
-
-];
-
-
-
-/* =========================
-
-   App State & Helpers
-
-   ========================= */
-
-const STATE_KEY = 'af_escape_state_v1';
-
-let state = {
-
-  completed: {}, // puzzleId: true
-
-  clues: [], // strings to show in clues panel
-
-  startTime: null,
-
-  timeLeft: 45 * 60, // in seconds
-
-};
-
-
-
-function saveState(){
-
-  localStorage.setItem(STATE_KEY, JSON.stringify(state));
-
-}
-
-function loadState(){
-
-  const raw = localStorage.getItem(STATE_KEY);
-
-  if(raw){
-
-    try{
-
-      state = JSON.parse(raw);
-
-      // ensure defaults
-
-      if(!state.startTime) state.startTime = Date.now();
-
-      if(!state.timeLeft) state.timeLeft = 45*60;
-
-    }catch(e){ console.warn('state parse',e) }
-
-  } else {
-
-    state.startTime = Date.now();
-
-  }
-
-}
-
-loadState();
-
-
-
-/* =========================
-
-   UI Rendering
-
-   ========================= */
-
-const main = document.getElementById('main');
-
-const progressEl = document.getElementById('progress');
-
-const completedEl = document.getElementById('completed');
-
-const totalEl = document.getElementById('total');
-
-const logEl = document.getElementById('log');
-
-const clueGrid = document.getElementById('clueGrid');
-
-const timerEl = document.getElementById('timer');
-
-
-
-function log(msg){
-
-  const p = document.createElement('div');
-
-  p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-
-  logEl.prepend(p);
-
-}
-
-
-
-function updateStatus(){
-
-  const total = PUZZLES.length;
-
-  const done = Object.keys(state.completed).length;
-
-  completedEl.textContent = done;
-
-  totalEl.textContent = total;
-
-  const pct = Math.round((done/total)*100);
-
-  progressEl.style.width = pct + '%';
-
-  // populate clues
-
-  clueGrid.innerHTML = '';
-
-  state.clues.forEach(c=>{
-
-    const d = document.createElement('div'); d.className='clue'; d.innerHTML = c;
-
-    clueGrid.appendChild(d);
-
-  });
-
-}
-
-updateStatus();
-
-
-
-function createPuzzleCard(p){
-
-  const card = document.createElement('section');
-
-  card.className='puzzle';
-
-  card.id = 'puzzle-'+p.id;
-
-  const h = document.createElement('h2'); h.textContent = p.title;
-
-  const desc = document.createElement('div'); desc.className='desc'; desc.innerHTML = p.prompt;
-
-  card.appendChild(h); card.appendChild(desc);
-
-
-
-  // different UI per type
-
-  if(p.type === 'riddle' || p.type === 'logic' || p.type === 'cipher' || p.type === 'substitution'){
-
-    const row = document.createElement('div'); row.className='code-row';
-
-    const input = document.createElement('input'); input.type='text'; input.placeholder='Enter answer or code';
-
-    input.id = 'input-'+p.id;
-
-    const submit = document.createElement('button'); submit.textContent='Submit';
-
-    submit.onclick = () => handleAnswer(p, input.value.trim());
-
-    row.appendChild(input); row.appendChild(submit);
-
-    card.appendChild(row);
-
-    card.appendChild(document.createElement('small')).className='hint';
-
-  } else if(p.type === 'suspect'){
-
-    // show suspects as clickable cards
-
-    const suspects = [
-
-      {id:'holly', name:'Holly Short', img:''},
-
-      {id:'mulch', name:'Mulch Diggums', img:''},
-
-      {id:'foaly', name:'Foaly', img:''},
-
-      {id:'opal', name:'Opal Koboi', img:''},
-
-    ];
-
-    const wrap = document.createElement('div'); wrap.className='suspects';
-
-    suspects.forEach(s=>{
-
-      const el = document.createElement('div'); el.className='suspect'; el.setAttribute('data-id', s.id);
-
-      el.innerHTML = `<img alt="${s.name}" src="data:image/svg+xml;utf8,
-
-        <svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><rect width='100%' height='100%' fill='%23111f26' /><text x='50%' y='50%' fill='%23c7a000' font-size='14' font-family='Arial' text-anchor='middle' dominant-baseline='middle'>${encodeURIComponent(s.name)}</text></svg>` 
-
-        + `<div style="font-weight:700;margin-top:6px">${s.name}</div>` ;
-
-      el.onclick = () => {
-
-        // select toggle
-
-        wrap.querySelectorAll('.suspect').forEach(x=>x.classList.remove('selected'));
-
-        el.classList.add('selected');
-
-      };
-
-      wrap.appendChild(el);
-
-    });
-
-    card.appendChild(wrap);
-
-    const accuseRow = document.createElement('div'); accuseRow.className='code-row'; accuseRow.style.marginTop='10px';
-
-    const accuseBtn = document.createElement('button'); accuseBtn.textContent='Accuse';
-
-    accuseBtn.onclick = () => {
-
-      const selected = card.querySelector('.suspect.selected');
-
-      if(!selected){ alert('Select a suspect first.'); return; }
-
-      handleSuspect(selected.getAttribute('data-id'));
-
-    };
-
-    accuseRow.appendChild(accuseBtn);
-
-    card.appendChild(accuseRow);
-
-  }
-
-
-
-  // visual completed
-
-  if(state.completed[p.id]){
-
-    card.style.opacity = '0.6';
-
-    const doneBadge = document.createElement('div'); doneBadge.style.cssText='float:right;background:rgba(0,0,0,0.3);padding:6px;border-radius:6px;font-weight:700;color:var(--accent)'; doneBadge.textContent='SOLVED';
-
-    h.appendChild(doneBadge);
-
-  }
-
-
-
-  return card;
-
-}
-
-
-
-function renderAll(){
-
-  main.innerHTML = '';
-
-  PUZZLES.forEach(p=>{
-
-    main.appendChild(createPuzzleCard(p));
-
-  });
-
-  updateStatus();
-
-}
-
-renderAll();
-
-
-
-/* =========================
-
-   Answer Handling
-
-   ========================= */
-
-
-
-function normalizeAnswer(a){
-
-  return (''+a).trim().toLowerCase().replace(/[^a-z0-9]/g,'');
-
-}
-
-
-
-function addClue(text){
-
-  state.clues.push(text);
-
-  saveState();
-
-  updateStatus();
-
-  log('New clue found: ' + text);
-
-}
-
-
-
-function markSolved(puzzleId){
-
-  if(state.completed[puzzleId]) return;
-
-  state.completed[puzzleId] = true;
-
-  saveState();
-
-  updateStatus();
-
-  // update UI card
-
-  const card = document.getElementById('puzzle-'+puzzleId);
-
-  if(card){
-
-    card.style.opacity = '0.6';
-
-    const badge = document.createElement('div'); badge.style.cssText='float:right;background:rgba(0,0,0,0.3);padding:6px;border-radius:6px;font-weight:700;color:var(--accent)'; badge.textContent='SOLVED';
-
-    card.querySelector('h2').appendChild(badge);
-
-  }
-
-}
-
-
-
-function handleAnswer(puzzle, input){
-
-  if(state.completed[puzzle.id]){ alert('Already solved.'); return; }
-
-  const type = puzzle.type;
-
-  let ok=false;
-
-  try{
-
-    if(typeof puzzle.solution === 'function'){
-
-      ok = puzzle.solution(input, state);
-
-    } else {
-
-      ok = normalizeAnswer(input) === normalizeAnswer(puzzle.solution);
-
-    }
-
-  }catch(e){ ok=false; console.warn(e) }
-
-
-
-  if(ok){
-
-    markSolved(puzzle.id);
-
-    if(puzzle.reward) addClue(puzzle.reward);
-
-    alert('Correct! ' + (puzzle.reward ? 'Clue added.' : ''));
-
-    // If the suspect puzzle solved and it's the final artifact, celebrate
-
-    if(puzzle.id === 'suspect'){
-
-      showFinalWin();
-
-    }
-
-  } else {
-
-    alert('Not quite — re-check your work or look for more clues.');
-
-    log('Incorrect attempt for ' + puzzle.id);
-
-  }
-
-}
-
-
-
-/* Suspect handler */
-
-function handleSuspect(choice){
-
-  const puzzle = PUZZLES.find(p=>p.id==='suspect');
-
-  if(!puzzle) return;
-
-  const ok = typeof puzzle.solution === 'function' && puzzle.solution(choice, state);
-
-  if(ok){
-
-    markSolved(puzzle.id);
-
-    if(puzzle.reward) addClue(puzzle.reward);
-
-    alert('You correctly identified the thief! ' + (puzzle.reward || ''));
-
-    showFinalWin();
-
-  } else {
-
-    alert('The evidence doesn’t support that accusation. Keep investigating.');
-
-    log('Wrong accusation: ' + choice);
-
-  }
-
-}
-
-
-
-/* =========================
-
-   Timer & Utilities
-
-   ========================= */
-
-let timerInterval = null;
-
-function startTimer(){
-
-  if(!state.startTime) state.startTime = Date.now();
-
-  if(timerInterval) clearInterval(timerInterval);
-
-  timerInterval = setInterval(()=>{
-
-    if(state.timeLeft <= 0){ clearInterval(timerInterval); timerEl.textContent = '00:00'; alert('Time is up!'); return; }
-
-    state.timeLeft--;
-
-    saveState();
-
-    const m = Math.floor(state.timeLeft / 60); const s = state.timeLeft % 60;
-
-    timerEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-
-  }, 1000);
-
-}
-
-startTimer();
-
-
-
-/* Admin / hint / reset */
-
-document.getElementById('resetBtn').onclick = () => {
-
-  if(!confirm('Reset all progress?')) return;
-
-  localStorage.removeItem(STATE_KEY);
-
-  state = {completed:{},clues:[],startTime:Date.now(),timeLeft:45*60};
-
-  saveState(); renderAll(); updateStatus(); log('Progress reset.');
-
-  startTimer();
-
-};
-
-
-
-document.getElementById('hintBtn').onclick = () => {
-
-  // find first unsolved puzzle and show small hint
-
-  const unsolved = PUZZLES.find(p=>!state.completed[p.id]);
-
-  if(!unsolved){ alert('All puzzles solved!'); return; }
-
-  let hint = 'Try reviewing clues on the table.';
-
-  if(unsolved.id === 'caesar-foaly') hint = 'Try shifting letters backward by 5 positions.';
-
-  if(unsolved.id === 'runes-sub') hint = 'Use the substitution key provided next to the runes.';
-
-  if(unsolved.id === 'suspect') hint = 'Make sure you found evidence linking Opal to the scene.';
-
-  alert('HINT: ' + hint);
-
-  log('Hint requested for ' + unsolved.id);
-
-};
-
-
-
-/* Final win */
-
-function showFinalWin(){
-
-  // show modal-style celebration
-
-  const overlay = document.createElement('div');
-
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999';
-
-  overlay.innerHTML = `
-
-    <div style="background:#061017;padding:28px;border-radius:12px;max-width:720px;text-align:center;color:#fff;border:2px solid rgba(199,160,0,0.08)">
-
-      <h2 style="color:var(--accent);margin-top:0">Artifact Recovered!</h2>
-
-      <p style="color:var(--muted)">Brilliant work. You solved the Manor's mysteries and recovered the fairy artifact from Opal Koboi's clutches.</p>
-
-      <div style="margin:18px 0;">
-
-        <strong>Reward Chest</strong>
-
-        <div style="margin-top:12px;background:linear-gradient(180deg,#3b2f00,#1b1200);padding:12px;border-radius:8px;color:#ffd;display:inline-block">
-
-          <div style="font-weight:700">Chest Code:  A-R-T</div>
-
-          <div style="font-size:12px;color:#bda85a">Use this to claim the artifact (or hand out prizes).</div>
-
-        </div>
-
-      </div>
-
-      <button id="closeWin" style="padding:10px 16px;border-radius:8px;background:var(--accent);border:0;font-weight:700">Close</button>
-
-    </div>
-
-  `;
-
-  document.body.appendChild(overlay);
-
-  overlay.querySelector('#closeWin').onclick = () => { overlay.remove(); };
-
-}
-
-
-
-/* expose admin: unlock via console command for convenience */
-
-window.adminUnlock = function(){
-
-  // reveal answers and mark all solved
-
-  PUZZLES.forEach(p=>{
-
-    state.completed[p.id] = true;
-
-    if(p.reward) state.clues.push(p.reward);
-
-  });
-
-  saveState(); renderAll(); updateStatus(); showFinalWin();
-
-  log('Admin unlock used.');
-
-};
-
-
-
-/* keyboard admin easter egg: type admin:unlock in console to call window.adminUnlock() */
-
-/* Expose safe API for debugging */
-
-window._AF = {state, PUZZLES, saveState, loadState, adminUnlock};
-
-
-
-/* initial log */
-
-log('Escape room ready. Good luck!');
-
-</script>
-
+ <div class="container">
+   <h1>Artemis Fowl Escape Room</h1>
+   <p>Solve each riddle to move closer to the hidden artifact.</p>
+
+   <!-- Riddle 1 -->
+   <div class="riddle" id="r1" style="display:block;">
+     <p><strong>Riddle 1:</strong> I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?</p>
+     <input type="text" id="a1" placeholder="Your answer">
+     <button onclick="checkAnswer(1, 'echo')">Submit</button>
+     <p id="f1"></p>
+   </div>
+
+   <!-- Riddle 2 -->
+   <div class="riddle" id="r2">
+     <p><strong>Riddle 2:</strong> Feed me and I grow, give me drink and I die. What am I?</p>
+     <input type="text" id="a2" placeholder="Your answer">
+     <button onclick="checkAnswer(2, 'fire')">Submit</button>
+     <p id="f2"></p>
+   </div>
+
+   <!-- Riddle 3 -->
+   <div class="riddle" id="r3">
+     <p><strong>Riddle 3:</strong> The artifact was stolen. Suspects: Holly, Mulch, Foaly, Opal.  
+     - The thief had mud on their boots.  
+     - The thief jammed the cameras.  
+     - Foaly swears he would have noticed jammers.  
+     - Holly never leaves mud.  
+     Who is the culprit?</p>
+     <input type="text" id="a3" placeholder="Your answer">
+     <button onclick="checkAnswer(3, 'opal')">Submit</button>
+     <p id="f3"></p>
+   </div>
+
+   <!-- Final Message -->
+   <div class="riddle" id="final">
+     <h2 class="success">Congratulations!</h2>
+     <p>You solved all the riddles and discovered the truth: <strong>Opal Koboi</strong> was behind the theft! The artifact is safe again.</p>
+   </div>
+ </div>
+
+ <script>
+   function checkAnswer(riddleNum, correct) {
+     const input = document.getElementById("a" + riddleNum).value.toLowerCase().trim();
+     const feedback = document.getElementById("f" + riddleNum);
+
+     if (input === correct) {
+       feedback.textContent = "Correct!";
+       feedback.className = "success";
+
+       // Hide current riddle, show next
+       document.getElementById("r" + riddleNum).style.display = "none";
+       if (document.getElementById("r" + (riddleNum + 1))) {
+         document.getElementById("r" + (riddleNum + 1)).style.display = "block";
+       } else {
+         document.getElementById("final").style.display = "block";
+       }
+     } else {
+       feedback.textContent = "Wrong answer, try again!";
+       feedback.className = "error";
+     }
+   }
+ </script>
 </body>
-
 </html>
